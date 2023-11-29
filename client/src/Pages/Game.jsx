@@ -7,7 +7,8 @@ import { Powerup } from '../Components/Game/Powerups/Powerup';
 import PowerupButton from '../Components/Game/Powerups/PowerupButton';
 import CoreGame from '../Components/OldGame/CoreGame';
 import OldTimer from '../Components/OldGame/OldTimer';
-import { fetchWords, postScore } from '../Util/ApiCalls';
+import ChatBox from '../Components/Chat';
+import { fetchWords, postScore, patchCoins } from '../Util/ApiCalls';
 
 const io = require('socket.io-client');
 
@@ -24,15 +25,12 @@ function GamePage({
   data = [],
   numRounds = data.length ? data.length : 10,
 }) {
-  const user = 'Guest';
-  const userId = '';
-
   // VERIFICATION
   if (gameCode === 'game') {
     window.location.pathname = '/';
   }
 
-  // STATE
+  // Lobby state
   const [gameCodeCopied, setGameCodeCopied] = React.useState(false);
   const [lobbyShown, setLobbyShown] = React.useState(true);
   const [gameDetails, setGameDetails] = React.useState({
@@ -51,6 +49,7 @@ function GamePage({
   const [currentRound, setCurrentRound] = React.useState(1);
   const [playerList, setPlayerList] = React.useState([]);
   const [currentScore, setCurrentScore] = React.useState(0);
+  const [coins, setCoins] = React.useState(0);
 
   // Game states
   const [gameStatus, updateGameStatus] = React.useState({
@@ -66,6 +65,7 @@ function GamePage({
     incorrectLettersGuessed: 0,
   });
   const [gameData, setGameData] = React.useState(data);
+  const [messages, setMessages] = React.useState([]);
 
   if (!playerList.includes(playerName)) {
     setPlayerList(playerList.concat(playerName));
@@ -125,13 +125,16 @@ function GamePage({
   // Called at the beginning
   // Called whenever game ends, if game ends then post score
   // If game does not end, get new word data
-  React.useEffect(() => {
+  useEffect(() => {
     if (lobbyDebug === false) {
+      console.log(gameStatus.gameEnd);
       if (gameStatus.gameEnd === true) {
-        // submit score
-        if (user !== 'Guest') {
-          console.log(`final score: ${gameStatus.score}`);
-          postScore(userId, gameStatus.score);
+        // submit score & update coins
+        if (userNameCK) {
+          const earnedCoins = Math.floor(gameStatus.score / 30);
+          setCoins(earnedCoins);
+          postScore(gameDetails.gameDetails.gameMode, userNameCK, gameStatus.score);
+          patchCoins(userNameCK, earnedCoins);
         }
       } else {
         fetchWords(numRounds)
@@ -148,6 +151,19 @@ function GamePage({
       }
     }
   }, [gameStatus.gameEnd]);
+
+  useEffect(() => {
+    const handleNewMessage = (socketData) => {
+      // Update the state with the new message
+      setMessages((prevMessages) => [...prevMessages, socketData]);
+    };
+
+    socket.on('message-lobby', handleNewMessage);
+
+    return () => {
+      socket.off('message-lobby', handleNewMessage);
+    };
+  }, []);
 
   // LOBBY
   if (lobbyShown && !lobbyDebug) {
@@ -189,7 +205,7 @@ function GamePage({
               </div>
             </div>
             <div className="lobbyChat">
-              Chat
+              <ChatBox messages={messages} sendMessage={sendMessage} />
             </div>
           </div>
           <div className="lobbyIntSide leftHead playerListTB">
@@ -234,6 +250,7 @@ function GamePage({
                 && (
                 <GameOver
                   score={currentScore}
+                  coins={coins}
                   restartGame={restartGame}
                 />
                 )}
@@ -367,6 +384,18 @@ function GamePage({
     updateActivePowerup('none');
   }
 
+  // Chat Functions
+  // Called by the ChatBox child component to send messages
+  function sendMessage(message) {
+    const newMessage = {
+      playerName: userNameCK,
+      message,
+      gameCode: gameDetails.gameDetails.gameCode,
+    };
+
+    socket.emit('message-lobby', newMessage);
+  }
+
   // HELPER FUNCTIONS
 
   /**
@@ -421,7 +450,6 @@ function GamePage({
 
   function startClientGame() {
     setLobbyShown(false);
-    console.log(gameDetails);
   }
 
   // eslint-disable-next-line no-unused-vars
