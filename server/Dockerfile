@@ -13,7 +13,6 @@ COPY . .
 # set environment variables
 ENV PORT 8080
 ENV SOCKET_PORT 6060
-ENV MONGODB_URL mongodb://mongodb:27017/dev
 
 EXPOSE 8080
 EXPOSE 6060
