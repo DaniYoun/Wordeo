@@ -1,23 +1,21 @@
 // These handle the socket.io server, which is what we use for multiplayer
-const { Server } = require('socket.io');
 // -----
 
 // Express server
 require('dotenv').config();
 const mongoose = require('mongoose');
 const logger = require('./logger');
-const app = require('./server');
+const { server, io } = require('./server');
 const wordData = require('./data/words.json');
 const Word = require('./models/words');
 const { initializeStoreItems } = require('./models/store');
 
 const HOST = '0.0.0.0';
 const PORT = process.env.PORT || 8080;
-const SOCKET_PORT = process.env.SOCKET_PORT || 6060;
 
 // Connect to the database
 mongoose.connect(process.env.MONGODB_URL)
-  .then(() => app.listen(PORT, HOST, () => {
+  .then(() => server.listen(PORT, HOST, () => {
     console.log('\n>> WORDEO SERVER');
     console.log('>> LOGS SAVING TO logs.txt FILE\n');
     logger.info(`Server listening on port ${HOST}:${PORT}`);
@@ -35,16 +33,6 @@ mongoose.connect(process.env.MONGODB_URL)
   .catch((err) => logger.error(err));
 
 // -----
-
-// Socket.io server
-
-// Start socket.io server on port 6060
-const io = new Server(SOCKET_PORT, {
-  cors: {
-    origin: '*',
-  },
-});
-
 // Socket.io event handlers
 io.on('connection', (socket) => {
   // When a client connects, log it - Commented out because it's annoying
