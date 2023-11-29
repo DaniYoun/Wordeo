@@ -11,7 +11,7 @@ import { fetchWords, postScore } from '../Util/ApiCalls';
 
 const io = require('socket.io-client');
 
-const API_URL = process.env.API_URL || 'http://localhost:8080';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 const MP_URL = 'http://localhost:6060';
 const socket = io(MP_URL);
 const playerName = document.cookie.split(';').some((item) => item.trim().startsWith('displayName=')) ? (`; ${document.cookie}`).split('; displayName=').pop().split(';')[0] : null;

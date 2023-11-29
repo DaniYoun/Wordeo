@@ -3,7 +3,7 @@ import { useState } from 'react';
 import '../Styles/SignIn.css';
 import WordeoLogo from '../Images/WordeoLogo.png';
 
-const API_URL = process.env.API_URL || 'http://localhost:8080';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 /**
  * **This sign in/up page allows users to sign in or sign up to Wordeo.**
