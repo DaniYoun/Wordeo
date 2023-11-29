@@ -8,7 +8,7 @@ import WordeoLogo from '../Images/WordeoLogo.png';
 import Achievement from '../Components/Achievement';
 
 // API URL
-const API_URL = 'http://localhost:8080';
+const API_URL = process.env.API_URL || 'http://localhost:8080';
 
 // Change this to true to test achievements
 const testingAchievements = false;

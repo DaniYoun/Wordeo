@@ -1,11 +1,11 @@
 import { GAME_MODES } from './GameModes';
 
-const baseUrl = 'http://localhost:8080';
+const API_URL = process.env.API_URL || 'http://localhost:8080';
 
 async function fetchWords(count) {
   let words;
   try {
-    const response = await fetch(`${baseUrl}/words?count=${count}`);
+    const response = await fetch(`${API_URL}/words?count=${count}`);
     const result = await response.json();
     words = result;
   } catch (error) {
@@ -23,7 +23,7 @@ async function postScore(userId, score) {
 
   console.log(payload);
 
-  await fetch(`${baseUrl}/scores`, {
+  await fetch(`${API_URL}/scores`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

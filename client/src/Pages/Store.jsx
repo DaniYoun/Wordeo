@@ -8,7 +8,7 @@ import Currency from '../Components/Store/Currency';
 import '../Styles/Store.css';
 
 // API URL
-const API_URL = 'http://localhost:8080';
+const API_URL = process.env.API_URL || 'http://localhost:8080';
 
 function Store({ initialItems = null, initialBalance = 5000 }) {
   const [storeStatus, updateStoreStatus] = React.useState({

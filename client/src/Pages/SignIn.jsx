@@ -3,6 +3,8 @@ import { useState } from 'react';
 import '../Styles/SignIn.css';
 import WordeoLogo from '../Images/WordeoLogo.png';
 
+const API_URL = process.env.API_URL || 'http://localhost:8080';
+
 /**
  * **This sign in/up page allows users to sign in or sign up to Wordeo.**
  *
@@ -21,7 +23,7 @@ function SignInPage() {
       password: pass,
     };
 
-    const res = await fetch('http://localhost:8080/api/register/', {
+    const res = await fetch(`${API_URL}/api/register/`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -43,7 +45,7 @@ function SignInPage() {
       password: pass,
     };
 
-    const res = await fetch('http://localhost:8080/api/login/', {
+    const res = await fetch(`${API_URL}/api/login/`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
