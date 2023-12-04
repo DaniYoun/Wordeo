@@ -34,6 +34,10 @@ mongoose.connect(process.env.MONGODB_URL)
   .catch((err) => logger.error(err));
 
 // -----
+
+// Socket.io
+const lobbies = {}; // dictionary to store room information
+
 // Socket.io event handlers
 io.on('connection', (socket) => {
   // When a client connects, log it - Commented out because it's annoying
