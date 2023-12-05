@@ -11,7 +11,7 @@ import NotFound from './Pages/NotFound';
 import Store from './Pages/Store';
 import Debug from './Pages/Debug';
 
-const DEBUG = true;
+const DEBUG = false;
 
 // Routes
 function App() {
